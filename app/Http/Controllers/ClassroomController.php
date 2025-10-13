@@ -41,7 +41,7 @@ class ClassroomController extends Controller
      */
     public function show(Classroom $classroom)
     {
-        $class = $classroom->with(['students', 'teacher'])->get();
+        $class = $classroom->load(['students', 'teacher']);
         return response()->json($class);
     }
 

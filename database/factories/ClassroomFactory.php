@@ -2,6 +2,9 @@
 
 namespace Database\Factories;
 
+use App\Enums\ClassroomGrade;
+use App\Enums\ClassroomType;
+use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -17,7 +20,10 @@ class ClassroomFactory extends Factory
     public function definition(): array
     {
         return [
-            //
+            'name' => $this->faker->unique()->word(),
+            'type' => $this->faker->randomElement(ClassroomType::cases()),
+            'grade' => $this->faker->randomElement(ClassroomGrade::cases()),
+            'teacher_id' => User::factory()->teacher(),
         ];
     }
 }

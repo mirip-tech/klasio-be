@@ -48,6 +48,6 @@ class Classroom extends Model
             table: 'enrollments',
             foreignPivotKey: 'classroom_id',
             relatedPivotKey: 'student_id'
-        );
+        )->withTimestamps();
     }
 }
