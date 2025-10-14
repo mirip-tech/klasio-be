@@ -6,6 +6,7 @@ use App\Enums\ClassroomGrade;
 use App\Enums\ClassroomType;
 use App\Models\Classroom;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
 
 class ClassroomController extends Controller
@@ -25,13 +26,13 @@ class ClassroomController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'name' => 'required|string|max:255',
+            'name' => ['required', 'string', 'max:255'],
             'teacher_id' => ['nullable', Rule::exists('users', 'id')->where('role', 'teacher')],
             'type' => ['required', Rule::enum(ClassroomType::class)],
             'grade' => ['required', Rule::enum(ClassroomGrade::class)],
         ]);
 
-        $class = Classroom::create($validated);
+        $class = DB::transaction(fn() => Classroom::create($validated));
 
         return response()->json($class, 201);
     }
@@ -50,7 +51,16 @@ class ClassroomController extends Controller
      */
     public function update(Request $request, Classroom $classroom)
     {
-        //
+        $validated = $request->validate([
+            'name' => ['sometimes', 'required', 'string', 'max:255'],
+            'teacher_id' => ['sometimes', 'nullable', 'integer', Rule::exists('users', 'id')->where('role', 'teacher')],
+            'type' => ['sometimes', 'required', Rule::enum(ClassroomType::class)],
+            'grade' => ['sometimes', 'required', Rule::enum(ClassroomGrade::class)],
+        ]);
+
+        DB::transaction(fn() => $classroom->update($validated));
+
+        return response()->json($classroom->fresh());
     }
 
     /**
@@ -58,7 +68,7 @@ class ClassroomController extends Controller
      */
     public function destroy(Classroom $classroom)
     {
-        $classroom->delete();
+        DB::transaction(fn() => $classroom->delete());
         return response()->json(['message' => 'classroom deleted']);
     }
 }
