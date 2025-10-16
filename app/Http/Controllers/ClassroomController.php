@@ -71,4 +71,20 @@ class ClassroomController extends Controller
         DB::transaction(fn() => $classroom->delete());
         return response()->json(['message' => 'classroom deleted']);
     }
+
+
+    /**
+     * Enroll collection of student
+     */
+    public function enroll(Request $request, Classroom $classroom)
+    {
+        $validated = $request->validate([
+            'student_ids' => 'required|array',
+            'student_ids.*' => 'exists:users,id',
+        ]);
+
+        DB::transaction(fn() => $classroom->students()->syncWithoutDetaching($validated['student_ids']));
+
+        return response()->json(['message' => 'students enrolled successfully']);
+    }
 }
