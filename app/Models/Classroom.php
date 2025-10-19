@@ -36,6 +36,7 @@ class Classroom extends Model
             'grade' => ClassroomGrade::class,
         ];
     }
+
     public function teacher()
     {
         return $this->belongsTo(User::class, 'teacher_id');

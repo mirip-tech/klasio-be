@@ -13,9 +13,10 @@ class AuthenticatedTokenController extends Controller
      */
     public function store(LoginRequest $request)
     {
-       $user = $request->authenticate();
-       $token = $user->createToken($request->device_name)->plainTextToken;
-       return response()->json($token);
+        $user = $request->authenticate();
+        $token = $user->createToken($request->device_name)->plainTextToken;
+
+        return response()->json($token);
     }
 
     /**
@@ -24,6 +25,7 @@ class AuthenticatedTokenController extends Controller
     public function destroy(Request $request)
     {
         $request->user()->currentAccessToken()->delete();
+
         return response()->json(['message' => 'Logged out']);
     }
 }

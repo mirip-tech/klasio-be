@@ -29,7 +29,7 @@ class LoginRequest extends FormRequest
         return [
             'email' => ['required', 'string', 'email'],
             'password' => ['required', 'string'],
-            'device_name' => ['required', 'string']
+            'device_name' => ['required', 'string'],
         ];
     }
 
@@ -87,7 +87,7 @@ class LoginRequest extends FormRequest
     {
         return $this->string('email')
             ->lower()
-            ->append('|' . $this->ip())
+            ->append('|'.$this->ip())
             ->transliterate()
             ->value();
     }
