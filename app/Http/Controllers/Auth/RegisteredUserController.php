@@ -26,7 +26,7 @@ class RegisteredUserController extends Controller
             'device_name' => ['required', 'string'],
         ]);
 
-        $token = DB::transaction(function() use ($request) {
+        $token = DB::transaction(function () use ($request) {
             $user = User::create([
                 'name' => $request->name,
                 'email' => $request->email,

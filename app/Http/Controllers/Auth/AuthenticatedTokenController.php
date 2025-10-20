@@ -21,7 +21,7 @@ class AuthenticatedTokenController extends Controller
                 ->where('is_active', true)
                 ->with('tenant:id,name,slug') // hanya ambil field penting dari tenant
                 ->get(['tenant_id', 'role'])
-                ->map(fn($m) => [
+                ->map(fn ($m) => [
                     'tenant_id' => $m->tenant_id,
                     'tenant' => $m->tenant,
                     'role' => $m->role,
@@ -45,7 +45,8 @@ class AuthenticatedTokenController extends Controller
      */
     public function destroy(Request $request)
     {
-        DB::transaction(fn() => $request->user()->currentAccessToken()->delete());
+        DB::transaction(fn () => $request->user()->currentAccessToken()->delete());
+
         return response()->json(['message' => 'Logged out']);
     }
 }

@@ -5,7 +5,6 @@ namespace Database\Seeders;
 use App\Models\Membership;
 use App\Models\Tenant;
 use App\Models\User;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
 class TenantSeeder extends Seeder
@@ -23,7 +22,9 @@ class TenantSeeder extends Seeder
 
         foreach ($tenants as $index => $tenant) {
             $group = $userGroups[$index] ?? collect();
-            if ($group->isEmpty()) continue;
+            if ($group->isEmpty()) {
+                continue;
+            }
 
             $roles = collect([
                 'owner',
@@ -31,7 +32,7 @@ class TenantSeeder extends Seeder
                 'teacher',
             ])->pad($group->count(), 'student');
 
-            $payload = $group->values()->map(fn($user, $i) => [
+            $payload = $group->values()->map(fn ($user, $i) => [
                 'user_id' => $user->id,
                 'tenant_id' => $tenant->id,
                 'role' => $roles[$i],

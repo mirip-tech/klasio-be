@@ -16,7 +16,7 @@ class Membership extends Model
         'user_id',
         'tenant_id',
         'role',
-        'is_active'
+        'is_active',
     ];
 
     /**
