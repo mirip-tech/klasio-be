@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Auth;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Auth\LoginRequest;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class AuthenticatedTokenController extends Controller
 {
@@ -13,10 +14,12 @@ class AuthenticatedTokenController extends Controller
      */
     public function store(LoginRequest $request)
     {
-        $user = $request->authenticate();
-        $token = $user->createToken($request->device_name)->plainTextToken;
+        $token = DB::transaction(function () use ($request) {
+            $user = $request->authenticate();
+            return $user->createToken($request->device_name)->plainTextToken;
+        });
 
-        return response()->json($token);
+        return response()->json(['token' => $token]);
     }
 
     /**
@@ -24,8 +27,7 @@ class AuthenticatedTokenController extends Controller
      */
     public function destroy(Request $request)
     {
-        $request->user()->currentAccessToken()->delete();
-
+        DB::transaction(fn() => $request->user()->currentAccessToken()->delete());
         return response()->json(['message' => 'Logged out']);
     }
 }
