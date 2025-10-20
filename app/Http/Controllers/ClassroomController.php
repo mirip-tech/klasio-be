@@ -28,7 +28,7 @@ class ClassroomController extends Controller
     {
         $validated = $request->validate([
             'name' => ['required', 'string', 'max:255'],
-            'teacher_id' => ['nullable', Rule::exists('users', 'id')->where('role', 'teacher')],
+            'teacher_id' => ['nullable', Rule::exists('users', 'id')],
             'type' => ['required', Rule::enum(ClassroomType::class)],
             'grade' => ['required', Rule::enum(ClassroomGrade::class)],
         ]);
@@ -55,7 +55,7 @@ class ClassroomController extends Controller
     {
         $validated = $request->validate([
             'name' => ['sometimes', 'required', 'string', 'max:255'],
-            'teacher_id' => ['sometimes', 'nullable', 'integer', Rule::exists('users', 'id')->where('role', 'teacher')],
+            'teacher_id' => ['sometimes', 'nullable', 'integer', Rule::exists('users', 'id')],
             'type' => ['sometimes', 'required', Rule::enum(ClassroomType::class)],
             'grade' => ['sometimes', 'required', Rule::enum(ClassroomGrade::class)],
         ]);

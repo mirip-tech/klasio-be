@@ -14,12 +14,30 @@ class AuthenticatedTokenController extends Controller
      */
     public function store(LoginRequest $request)
     {
-        $token = DB::transaction(function () use ($request) {
+        [$token, $memberships] = DB::transaction(function () use ($request) {
             $user = $request->authenticate();
-            return $user->createToken($request->device_name)->plainTextToken;
+
+            $memberships = $user->memberships()
+                ->where('is_active', true)
+                ->with('tenant:id,name,slug') // hanya ambil field penting dari tenant
+                ->get(['tenant_id', 'role'])
+                ->map(fn($m) => [
+                    'tenant_id' => $m->tenant_id,
+                    'tenant' => $m->tenant,
+                    'role' => $m->role,
+                ])
+                ->values();
+
+            $user->tokens()->delete();
+            $token = $user->createToken($request->device_name)->plainTextToken;
+
+            return [$token, $memberships];
         });
 
-        return response()->json(['token' => $token]);
+        return response()->json([
+            'token' => $token,
+            'memberships' => $memberships,
+        ]);
     }
 
     /**
