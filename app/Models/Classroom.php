@@ -6,6 +6,7 @@ use App\Enums\ClassroomGrade;
 use App\Enums\ClassroomType;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Builder;
 
 class Classroom extends Model
 {
@@ -22,6 +23,7 @@ class Classroom extends Model
         'type',
         'grade',
         'teacher_id',
+        'tenant_id'
     ];
 
     /**
@@ -35,6 +37,30 @@ class Classroom extends Model
             'type' => ClassroomType::class,
             'grade' => ClassroomGrade::class,
         ];
+    }
+
+    protected static function booted(): void
+    {
+        static::creating(function (Classroom $model) {
+            /** @var Tenant|null $tenant */
+            $tenant = app('tenant');
+            if ($tenant) {
+                $model->tenant_id = $tenant->id;
+            }
+        });
+
+        static::addGlobalScope('tenant', function (Builder $builder) {
+            /** @var Tenant|null $tenant */
+            $tenant = app('tenant');
+            if ($tenant) {
+                $builder->where('tenant_id', $tenant->id);
+            }
+        });
+    }
+
+    public function tenant()
+    {
+        return $this->belongsTo(Tenant::class);
     }
 
     public function teacher()

@@ -9,5 +9,7 @@ Route::post('/auth/register', [RegisteredUserController::class, 'store']);   // 
 Route::post('/auth/token', [AuthenticatedTokenController::class, 'store']);   // generate token (login)
 Route::delete('/auth/token', [AuthenticatedTokenController::class, 'destroy'])->middleware('auth:sanctum'); // revoke token (logout)
 
-Route::apiResource('classroom', ClassroomController::class);
-Route::post('classroom/{classroom}/enroll', [ClassroomController::class, 'enroll']);
+Route::middleware(['auth:sanctum', 'tenant'])->group(function () {
+    Route::apiResource('classroom', ClassroomController::class);
+    Route::post('classroom/{classroom}/enroll', [ClassroomController::class, 'enroll']);
+});
