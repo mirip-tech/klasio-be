@@ -4,9 +4,9 @@ namespace App\Models;
 
 use App\Enums\ClassroomGrade;
 use App\Enums\ClassroomType;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Builder;
 
 class Classroom extends Model
 {
@@ -23,7 +23,7 @@ class Classroom extends Model
         'type',
         'grade',
         'teacher_id',
-        'tenant_id'
+        'tenant_id',
     ];
 
     /**

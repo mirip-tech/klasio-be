@@ -19,7 +19,7 @@ class Enrollment extends Model
     protected $fillable = [
         'classroom_id',
         'student_id',
-        'tenant_id'
+        'tenant_id',
     ];
 
     protected static function booted(): void
