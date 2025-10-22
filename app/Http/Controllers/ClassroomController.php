@@ -4,9 +4,12 @@ namespace App\Http\Controllers;
 
 use App\Enums\ClassroomGrade;
 use App\Enums\ClassroomType;
+use App\Enums\Role;
 use App\Models\Classroom;
+use App\Rules\MemberOfTenant;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Route;
 use Illuminate\Validation\Rule;
 
 class ClassroomController extends Controller
@@ -17,7 +20,6 @@ class ClassroomController extends Controller
     public function index()
     {
         $classes = Classroom::with('teacher')->get();
-
         return response()->json($classes);
     }
 
@@ -28,12 +30,12 @@ class ClassroomController extends Controller
     {
         $validated = $request->validate([
             'name' => ['required', 'string', 'max:255'],
-            'teacher_id' => ['nullable', Rule::exists('users', 'id')],
+            'teacher_id' => ['nullable', 'integer:strict', Rule::exists('users', 'id'), new MemberOfTenant(Role::TEACHER)],
             'type' => ['required', Rule::enum(ClassroomType::class)],
             'grade' => ['required', Rule::enum(ClassroomGrade::class)],
         ]);
 
-        $class = DB::transaction(fn () => Classroom::create($validated));
+        $class = DB::transaction(fn() => Classroom::create($validated));
 
         return response()->json($class, 201);
     }
@@ -55,12 +57,12 @@ class ClassroomController extends Controller
     {
         $validated = $request->validate([
             'name' => ['sometimes', 'required', 'string', 'max:255'],
-            'teacher_id' => ['sometimes', 'nullable', 'integer', Rule::exists('users', 'id')],
+            'teacher_id' => ['sometimes', 'nullable', 'integer:strict', Rule::exists('users', 'id'), new MemberOfTenant(Role::TEACHER)],
             'type' => ['sometimes', 'required', Rule::enum(ClassroomType::class)],
             'grade' => ['sometimes', 'required', Rule::enum(ClassroomGrade::class)],
         ]);
 
-        DB::transaction(fn () => $classroom->update($validated));
+        DB::transaction(fn() => $classroom->update($validated));
 
         return response()->json($classroom->fresh());
     }
@@ -70,7 +72,7 @@ class ClassroomController extends Controller
      */
     public function destroy(Classroom $classroom)
     {
-        DB::transaction(fn () => $classroom->delete());
+        DB::transaction(fn() => $classroom->delete());
 
         return response()->json(['message' => 'classroom deleted']);
     }
@@ -85,7 +87,7 @@ class ClassroomController extends Controller
             'student_ids.*' => 'exists:users,id',
         ]);
 
-        DB::transaction(fn () => $classroom->students()->syncWithoutDetaching($validated['student_ids']));
+        DB::transaction(fn() => $classroom->students()->syncWithoutDetaching($validated['student_ids']));
 
         return response()->json(['message' => 'students enrolled successfully']);
     }

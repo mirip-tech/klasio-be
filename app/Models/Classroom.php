@@ -49,7 +49,7 @@ class Classroom extends Model
             }
         });
 
-        static::addGlobalScope('tenant', function (Builder $builder) {
+        static::addGlobalScope('tenantScope', function (Builder $builder) {
             /** @var Tenant|null $tenant */
             $tenant = app('tenant');
             if ($tenant) {
