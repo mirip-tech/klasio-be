@@ -76,7 +76,7 @@ class Classroom extends Model
             foreignPivotKey: 'classroom_id',
             relatedPivotKey: 'student_id'
         )
-        ->using(Enrollment::class)
-        ->withTimestamps();
+            ->using(Enrollment::class)
+            ->withTimestamps();
     }
 }

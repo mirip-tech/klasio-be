@@ -35,7 +35,7 @@ class MemberOfTenant implements ValidationRule
             ->where('is_active', true)
             ->when(
                 $this->role,
-                fn($q) => $q->where('role', $this->role->value)
+                fn ($q) => $q->where('role', $this->role->value)
             );
 
         $validIds = $query->pluck('user_id')->all();
@@ -43,7 +43,7 @@ class MemberOfTenant implements ValidationRule
         $invalid = array_diff($values, $validIds);
 
         if ($invalid) {
-            $fail("Invalid membership for: " . implode(',', $invalid));
+            $fail('Invalid membership for: '.implode(',', $invalid));
         }
     }
 }
