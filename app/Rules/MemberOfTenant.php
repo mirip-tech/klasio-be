@@ -27,14 +27,23 @@ class MemberOfTenant implements ValidationRule
             return;
         }
 
+        $values = is_array($value) ? $value : [$value];
+
         $query = Membership::query()
-            ->where('user_id', $value)
+            ->whereIn('user_id', $values)
             ->where('tenant_id', $tenant->id)
             ->where('is_active', true)
-            ->when($this->role, fn ($q) => $q->where('role', $this->role->value));
+            ->when(
+                $this->role,
+                fn($q) => $q->where('role', $this->role->value)
+            );
 
-        if (! $query->exists()) {
-            $fail("The selected {$attribute} is not a valid member for this tenant.");
+        $validIds = $query->pluck('user_id')->all();
+
+        $invalid = array_diff($values, $validIds);
+
+        if ($invalid) {
+            $fail("Invalid membership for: " . implode(',', $invalid));
         }
     }
 }

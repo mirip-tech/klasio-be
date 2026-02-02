@@ -35,7 +35,7 @@ class ClassroomController extends Controller
             'grade' => ['required', Rule::enum(ClassroomGrade::class)],
         ]);
 
-        $class = DB::transaction(fn () => Classroom::create($validated));
+        $class = DB::transaction(fn() => Classroom::create($validated));
 
         return response()->json($class, 201);
     }
@@ -62,7 +62,7 @@ class ClassroomController extends Controller
             'grade' => ['sometimes', 'required', Rule::enum(ClassroomGrade::class)],
         ]);
 
-        DB::transaction(fn () => $classroom->update($validated));
+        DB::transaction(fn() => $classroom->update($validated));
 
         return response()->json($classroom->fresh());
     }
@@ -72,7 +72,7 @@ class ClassroomController extends Controller
      */
     public function destroy(Classroom $classroom)
     {
-        DB::transaction(fn () => $classroom->delete());
+        DB::transaction(fn() => $classroom->delete());
 
         return response()->json(['message' => 'classroom deleted']);
     }
@@ -83,11 +83,13 @@ class ClassroomController extends Controller
     public function enroll(Request $request, Classroom $classroom)
     {
         $validated = $request->validate([
-            'student_ids' => 'required|array',
-            'student_ids.*' => 'exists:users,id',
+            'student_ids' => ['required', 'array'],
+            'student_ids.*' => ['integer:strict', 'distinct'],
+            'student_ids' => [new MemberOfTenant(Role::STUDENT)],
         ]);
 
-        DB::transaction(fn () => $classroom->students()->syncWithoutDetaching($validated['student_ids']));
+
+        DB::transaction(fn() => $classroom->students()->syncWithoutDetaching($validated['student_ids']));
 
         return response()->json(['message' => 'students enrolled successfully']);
     }
